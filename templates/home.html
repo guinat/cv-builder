@@ -1,0 +1,31 @@
+{% extends 'base.html' %} {% block content %}
+<div class="text-center">
+	<h1 class="text-4xl font-bold text-gray-800 mb-6">
+		Bienvenue sur le Créateur de CV interactif!
+	</h1>
+	{% if session.get('user_id') %}
+	<a
+		href="/create-cv"
+		class="inline-block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 transition duration-300"
+		>Commencer la Création de votre CV</a
+	>
+	<br />
+	<a
+		href="/logout"
+		class="inline-block bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-300 mt-3"
+		>Se Déconnecter</a
+	>
+	{% else %}
+	<a
+		href="/register"
+		class="inline-block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 transition duration-300"
+		>Inscription</a
+	>
+	<a
+		href="/login"
+		class="inline-block bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition duration-300"
+		>Connexion</a
+	>
+	{% endif %}
+</div>
+{% endblock %}
