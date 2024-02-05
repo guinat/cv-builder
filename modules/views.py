@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from .extensions import mysql, bcrypt
 from modules.alerts import success, danger, info
+from .forms import CVForm
 
 app_views = Blueprint('app_views', __name__)
 
@@ -71,5 +72,50 @@ def login():
 @app_views.route('/logout')
 def logout():
     session.pop('user_id', None)
-    flash('Vous êtes déconnecté.', 'info')
+    info('Vous êtes déconnecté.')
+    return redirect(url_for('app_views.home'))
+
+
+@app_views.route('/create-cv', methods=['GET', 'POST'])
+def create_cv():
+    form = CVForm()
+    if form.validate_on_submit():
+        # TODO:
+        success('Votre CV a été créé avec succès!')
+        return redirect(url_for('app_views.home'))
+
+    return render_template('create_cv.html', form=form)
+
+
+@app_views.route('/save-cv', methods=['POST'])
+def save_cv():
+    if not session.get('user_id'):
+        danger('Vous devez être connecté pour créer un CV.')
+        return redirect(url_for('app_views.login'))
+
+    user_id = session.get('user_id')
+
+    personal_info = request.form.get('personal_info')
+    professional_experience = request.form.get('professional_experience')
+    education = request.form.get('education')
+    skills = request.form.get('skills')
+    languages = request.form.get('languages')
+    hobbies = request.form.get('hobbies')
+
+    cur = mysql.connection.cursor()
+
+    cur.execute("""INSERT INTO cv (user_id, personal_info, professional_experience, education, skills, languages, hobbies) 
+                   VALUES (%s, %s, %s, %s, %s, %s, %s)
+                   ON DUPLICATE KEY UPDATE
+                   personal_info = VALUES(personal_info),
+                   professional_experience = VALUES(professional_experience),
+                   education = VALUES(education),
+                   skills = VALUES(skills),
+                   languages = VALUES(languages),
+                   hobbies = VALUES(hobbies)""",
+                (user_id, personal_info, professional_experience, education, skills, languages, hobbies))
+    mysql.connection.commit()
+    cur.close()
+
+    success('Votre CV a été sauvegardé avec succès!')
     return redirect(url_for('app_views.home'))
