@@ -1,20 +1,70 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>CV Builder</title>
+		<title>Créateur de CV interactif</title>
 		<link
 			href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
 			rel="stylesheet" />
 	</head>
 	<body>
-		{% with messages = get_flashed_messages(with_categories=true) %} {% if
-		messages %} {% for category, message in messages %}
-		<div class="max-w-lg mx-auto mt-4">
-			<div
-				class="{{ 'bg-blue-500' if category == 'info' else 'bg-green-500' if category == 'success' else 'bg-yellow-500' if category == 'warning' else 'bg-red-500' }} text-white p-3 rounded mb-2">
-				{{ message }}
+		<nav class="bg-gray-800">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div class="flex items-center justify-between h-16">
+					<div class="flex items-center">
+						<div class="flex-shrink-0">
+							<a
+								href="{{ url_for('app_views.home') }}"
+								class="text-white px-3 py-2 rounded-md text-sm font-medium"
+								>Accueil</a
+							>
+						</div>
+						<div class="hidden md:block">
+							<div class="ml-10 flex items-baseline">
+								{% if not session.get('user_id') %}
+								<a
+									href="{{ url_for('app_views.register') }}"
+									class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+									>Inscription</a
+								>
+								<a
+									href="{{ url_for('app_views.login') }}"
+									class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+									>Connexion</a
+								>
+								{% else %}
+								<a
+									href="{{ url_for('app_views.logout') }}"
+									class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+									>Déconnexion</a
+								>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</nav>
+
+		<!-- Contenu principal de la page -->
+		<div class="py-6">
+			<!-- Zone pour afficher les messages flash -->
+			<div class="fixed bottom-0 right-0 mb-4 mr-4 z-50">
+				{% with messages = get_flashed_messages(with_categories=true) %} {% if
+				messages %} {% for category, message in messages %}
+				<div
+					class="{{ 'bg-blue-500' if category == 'info' else 'bg-green-500' if category == 'success' else 'bg-yellow-500' if category == 'warning' else 'bg-red-500' }} text-white px-6 py-4 border-0 rounded relative mb-4 shadow-lg flex items-center justify-between">
+					<span class="inline-block align-middle mr-8"> {{ message }} </span>
+					<button
+						class="bg-transparent text-2xl leading-none outline-none focus:outline-none"
+						onclick="this.parentElement.remove();">
+						<span>&times;</span>
+					</button>
+				</div>
+				{% endfor %} {% endif %} {% endwith %}
+			</div>
+			<div class="mt-48 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				{% block content %}{% endblock %}
 			</div>
 		</div>
-		{% endfor %} {% endif %} {% endwith %} {% block content %}{% endblock %}
 	</body>
 </html>

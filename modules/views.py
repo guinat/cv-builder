@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from .extensions import mysql, bcrypt
-from modules.alerts import success, danger
+from modules.alerts import success, danger, info
 
 app_views = Blueprint('app_views', __name__)
 
@@ -54,12 +54,16 @@ def login():
         user = cur.fetchone()
         cur.close()
 
-        if user and bcrypt.check_password_hash(user['password'], plain_password):
-            session['user_id'] = user['id']
-            flash('Connexion réussie', 'success')
-            return redirect(url_for('app_views.home'))
+        if user:
+            if bcrypt.check_password_hash(user['password'], plain_password):
+                session['user_id'] = user['id']
+                success('Connexion réussie')
+                return redirect(url_for('app_views.home'))
+            else:
+                danger('Mot de passe incorrect')
         else:
-            flash('Email ou mot de passe incorrect', 'danger')
+            info('Email non trouvé. Veuillez vous inscrire.')
+            return redirect(url_for('app_views.register'))
 
     return render_template('login.html')
 
